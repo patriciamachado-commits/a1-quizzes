@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1 Quiz 4: Final Prep</title>
+    <style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#f5af19 0%,#f12711 100%);min-height:100vh;padding:20px}
+.container{max-width:700px;margin:0 auto}
+.header{background:#fff;border-radius:20px;padding:25px;margin-bottom:20px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.header h1{color:#f12711;font-size:1.4em;margin-bottom:5px}
+.quiz-badge{background:linear-gradient(90deg,#f5af19,#f12711);color:#fff;padding:4px 12px;border-radius:20px;font-size:.8em;display:inline-block;margin-bottom:10px}
+.level-tag{background:#fff3e0;color:#f12711;padding:3px 10px;border-radius:10px;font-size:.75em;margin-left:8px}
+.timer-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:15px;padding:10px;background:#fff3cd;border-radius:10px}
+.timer-bar .time{font-size:1.2em;font-weight:700;color:#856404}
+.timer-bar.warning{background:#ffebee}.timer-bar.warning .time{color:#c62828}
+.card{background:#fff;border-radius:16px;padding:25px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.xp-display{background:#fff3e0;padding:6px 12px;border-radius:20px;font-weight:600;color:#f12711;font-size:.9em}
+.progress-bar-bg{height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden;margin-bottom:20px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#f5af19,#f12711);border-radius:4px;transition:width 0.3s}
+.question-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:15px}
+.question-num{background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.question-text{font-size:1.1em;color:#333;font-weight:500;line-height:1.4}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{padding:15px;border:2px solid #e0e0e0;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .2s}
+.option:hover{border-color:#f12711;background:#fff3e0}
+.option.selected{border-color:#f12711;background:#ffe0b2}
+.option.correct{border-color:#22c55e;background:#f0fdf4}
+.option.incorrect{border-color:#ef4444;background:#fef2f2}
+.option.disabled{pointer-events:none}
+.option-letter{width:28px;height:28px;border:2px solid #ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.option.selected .option-letter{border-color:#f12711;background:#f12711;color:#fff}
+.option.correct .option-letter{border-color:#22c55e;background:#22c55e;color:#fff}
+.option.incorrect .option-letter{border-color:#ef4444;background:#ef4444;color:#fff}
+.feedback{margin-top:10px;padding:12px 15px;border-radius:10px;font-size:.9em;display:none}
+.feedback.correct{background:#f0fdf4;border:1px solid #22c55e;color:#166534}
+.feedback.incorrect{background:#fef2f2;border:1px solid #ef4444;color:#991b1b}
+.feedback.show{display:block}
+.btn{background:linear-gradient(90deg,#f5af19,#f12711);color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;width:100%;margin-top:15px}
+.btn:hover{opacity:.9}.btn:disabled{background:#ccc}
+.btn-next{background:#22c55e}
+.results-screen{display:none}
+.results-card{background:linear-gradient(135deg,#f5af19,#f12711);border-radius:20px;padding:35px;color:#fff;text-align:center}
+.results-score{font-size:4em;font-weight:700}
+.results-message{font-size:1.2em;margin-top:20px;padding:15px;background:rgba(255,255,255,.15);border-radius:12px}
+.results-xp span{font-size:1.5em;font-weight:700}
+.results-details{background:#fff;border-radius:16px;padding:20px;margin-top:20px;color:#333}
+.results-details h3{color:#f12711;margin-bottom:15px}
+.result-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
+.practice-section{background:#fff;border-radius:16px;padding:20px;margin-top:20px;border-left:4px solid #ef4444}
+.practice-section.success{border-left-color:#22c55e}
+.practice-item{background:#fef2f2;border-radius:10px;padding:15px;margin-bottom:10px}
+.practice-item h4{color:#333;margin-bottom:8px}
+.practice-item ul{margin:10px 0;padding-left:20px;color:#666;font-size:.85em}
+.practice-item a{display:inline-block;background:#f12711;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:.85em}
+.strong-tag{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:4px 10px;border-radius:15px;font-size:.8em;margin:3px}
+.new-badge{background:#fff3cd;border:2px solid #ffc107;border-radius:12px;padding:15px;margin-top:15px;text-align:center}
+.new-badge .badge-icon{font-size:2em}
+.btn-dashboard{background:#F5A623;margin-top:15px}
+.streak-box{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:15px;margin-top:15px;color:#fff;text-align:center}
+.streak-num{font-size:1.5em;font-weight:700}
+.name-section input{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;margin-bottom:15px}
+.name-section input:focus{outline:none;border-color:#f12711}
+.class-section{margin-bottom:15px}
+.class-section select{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;background:#fff}
+.class-section select:focus{outline:none;border-color:#f12711}
+.start-info{background:#fff3e0;border-radius:12px;padding:15px;margin-bottom:20px;text-align:left}
+.start-info li{margin:8px 0;color:#555}
+.locked-msg{background:#ffebee;border:2px solid #ef5350;border-radius:12px;padding:30px;text-align:center}
+.locked-msg h2{color:#c62828}
+.ready-banner{background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:12px;padding:20px;color:#fff;text-align:center;margin-top:15px}
+
+</style>
+</head>
+<body>
+<div class="container">
+    
+    <div id="startScreen">
+        <div class="header"><div class="quiz-badge">Quiz 4 of 4 - FINAL PREP 🎯</div><span class="level-tag">A1</span><h1>🏆 Final Prep</h1><p style="color:#666;font-size:.9em">Class 13 Quiz</p></div>
+        <div class="card" style="text-align:center">
+            <h2 style="color:#f12711;margin-bottom:10px">Present Simple Mastery 💪</h2>
+            <p style="color:#666;margin-bottom:20px">Last quiz before the Final Test!</p>
+            <div class="start-info"><ul><li>⏱️ 15 questions • 10 minutes</li><li>📝 He/She/It forms (-s/-es)</li><li>🎯 Subject-verb agreement</li></ul></div>
+            <div class="name-section"><input type="text" id="studentName" placeholder="Enter your full name..."></div>
+            <div class="class-section"><select id="studentLevel"><option value="">Select your level...</option><option value="A1 (PS1) - Beginner" selected>A1 (PS1) - Beginner</option><option value="A2 (PS2) - Elementary">A2 (PS2) - Elementary</option><option value="B1 (PS3) - Intermediate">B1 (PS3) - Intermediate</option><option value="B2 (JS1) - Upper-Intermediate">B2 (JS1) - Upper-Intermediate</option><option value="C1 (JS2) - Advanced">C1 (JS2) - Advanced</option><option value="Conversation">Conversation</option></select></div>
+            <div class="class-section"><select id="studentClass"><option value="">Select your class...</option><optgroup label="A1 (PS1)"><option value="3071-MW-11AM">3071 - Mon/Wed 11AM (Eunice)</option><option value="3081-TTH-11AM">3081 - Tue/Thu 11AM (Eunice)</option></optgroup><optgroup label="A2 (PS2)"><option value="3072-MW-9AM">3072 - Mon/Wed 9AM (Angela)</option><option value="3082-TTH-9AM">3082 - Tue/Thu 9AM (Angela)</option></optgroup><optgroup label="B1 (PS3)"><option value="3073-MW-9AM">3073 - Mon/Wed 9AM (Tom)</option><option value="3083-TTH-9AM">3083 - Tue/Thu 9AM (Tom)</option></optgroup><optgroup label="B2 (JS1)"><option value="3074-MW-11AM">3074 - Mon/Wed 11AM (Laura)</option><option value="3084-TTH-11AM">3084 - Tue/Thu 11AM (Laura)</option></optgroup><optgroup label="C1 (JS2)"><option value="3075-MW-11AM">3075 - Mon/Wed 11AM (Laura)</option><option value="3085-TTH-11AM">3085 - Tue/Thu 11AM (Laura)</option></optgroup><optgroup label="Conversation"><option value="3076-SAT-9AM">3076 - Sat 9AM (Laura)</option></optgroup></select></div>
+            <button class="btn" onclick="startQuiz()">Start Final Prep →</button>
+        </div>
+    </div>
+    <div id="quizScreen" style="display:none">
+        <div class="header"><div class="quiz-badge">Quiz 4 - FINAL PREP</div><h1>🏆 Present Simple Mastery</h1><div class="timer-bar" id="timerBar"><span>⏱️</span><span class="time" id="timer">10:00</span></div></div>
+        <div class="card"><div class="progress-row"><span class="progress-text">Question <span id="currentQ">1</span> of <span id="totalQ">15</span></span><span class="xp-display">⭐ <span id="currentXP">0</span> XP</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div><div id="questionContainer"></div><button class="btn" id="checkBtn" onclick="checkAnswer()" disabled>Check Answer</button><button class="btn btn-next" id="nextBtn" onclick="nextQuestion()" style="display:none">Next →</button></div>
+    </div>
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-card"><p style="opacity:.8">🎉 All Quizzes Complete!</p><div class="results-score" id="finalScore">0/15</div><div class="results-label" id="finalPercent">0%</div><div class="results-message" id="resultsMessage"></div><div class="results-xp" style="margin-top:20px">You earned <span id="earnedXP">0</span> XP! ⭐</div></div>
+        <div class="ready-banner" id="readyBanner"><h3>🎓 Ready for the Final Test!</h3><p>You've completed all 4 quizzes!</p></div>
+        <div class="results-details"><h3>📊 Results</h3><div class="result-row"><span>Correct</span><span id="correctCount">0/15</span></div><div class="result-row"><span>Time</span><span id="timeTaken">0:00</span></div><div class="result-row"><span>XP This Quiz</span><span id="xpEarned">0</span></div><div class="result-row"><span>Total XP</span><span id="totalXPDisplay">0</span></div></div>
+        <div class="practice-section" id="practiceSection"><h3 id="practiceTitle">📚 Practice</h3><div id="practiceContent"></div></div>
+        <div id="newBadgeSection"></div><div id="streakSection"></div>
+        
+        <div style="background:#fff3cd;border:2px solid #f5a623;border-radius:14px;padding:16px;margin-bottom:12px;text-align:center;">
+    <p style="font-size:.9em;color:#856404;margin-bottom:10px;">⚠️ <strong>Two steps to submit:</strong><br>1️⃣ Click the button below &nbsp;→&nbsp; 2️⃣ Click <strong>Submit</strong> on the form</p>
+    <a id="formSubmitBtn" href="#" target="_blank" style="background:linear-gradient(135deg,#f5a623,#e8470a);color:#fff;padding:20px;border-radius:14px;font-size:1.15em;font-weight:800;text-align:center;text-decoration:none;display:block;width:100%;box-sizing:border-box;letter-spacing:.5px;box-shadow:0 6px 20px rgba(245,166,35,.4);">📨 SUBMIT RESULTS TO TEACHER →</a>
+</div><button class="btn btn-dashboard" onclick="goToDashboard()">← Dashboard</button>
+        <button class="btn" onclick="location.reload()" style="background:#666;margin-top:10px">Try Again</button>
+    </div>
+</div>
+<script>
+const STORAGE_KEY='SQA_A1_Quiz_Progress',QUIZ_ID=4,QUIZ_NAME='A1 Quiz 4: Final Prep (Class 13)',REQUIRED_QUIZ=3;
+const allQuestions=[
+    {q:"My friends and I ___ basketball on Fridays.",opts:["play","plays","playing","are play"],correct:0,category:"i_we_they",explanation:"With I/we/they: base form → play"},
+    {q:"I ___ coffee every morning.",opts:["drink","drinks","drinking","am drink"],correct:0,category:"i_we_they",explanation:"With I: base form → drink"},
+    {q:"We ___ our lunch in the restaurant.",opts:["eats","eat","eating","are eat"],correct:1,category:"i_we_they",explanation:"With we: base form → eat"},
+    {q:"They ___ dinner at 8 o'clock.",opts:["has","have","having","is have"],correct:1,category:"i_we_they",explanation:"With they: 'have' not 'has'"},
+    {q:"She ___ shopping on Saturdays.",opts:["go","goes","going","to go"],correct:1,category:"he_she_it",explanation:"With she: add -es → goes"},
+    {q:"He ___ at a supermarket.",opts:["work","is work","working","works"],correct:3,category:"he_she_it",explanation:"With he: add -s → works"},
+    {q:"She ___ to work by bus.",opts:["go","goes","going","to go"],correct:1,category:"he_she_it",explanation:"With she: add -es → goes"},
+    {q:"My brother ___ a sandwich for lunch.",opts:["likes","like","to like","is like"],correct:0,category:"he_she_it",explanation:"With he: add -s → likes"},
+    {q:"This restaurant ___ good pizza.",opts:["sell","selling","are sell","sells"],correct:3,category:"he_she_it",explanation:"With it: add -s → sells"},
+    {q:"My dog ___ a lot of food.",opts:["eat","is eat","eating","eats"],correct:3,category:"he_she_it",explanation:"With it: add -s → eats"},
+    {q:"Our teacher ___ us lots of homework.",opts:["give","gives","giving","to give"],correct:1,category:"he_she_it",explanation:"With he/she: add -s → gives"},
+    {q:"The trains ___ at the station at 5 PM.",opts:["leave","are leave","leaving","leaves"],correct:0,category:"plural_subjects",explanation:"Plural 'trains': base form → leave"},
+    {q:"The movie ___ at 7 o'clock.",opts:["start","is starts","starts","are start"],correct:2,category:"he_she_it",explanation:"With it: add -s → starts"},
+    {q:"The bus ___ near the library.",opts:["stop","stops","stopping","are stop"],correct:1,category:"he_she_it",explanation:"With it: add -s → stops"},
+    {q:"The coffee shop ___ open on Sundays.",opts:["is","are","be","being"],correct:0,category:"verb_to_be",explanation:"With it: use 'is'"}
+];
+const practiceResources={i_we_they:{title:"I/We/They Forms",description:"Base form",tips:["I play, We eat, They have"],link:"https://www.youtube.com/results?search_query=present+simple+i+we+they"},he_she_it:{title:"He/She/It (-s/-es)",description:"Add -s or -es",tips:["He works, She goes, It eats"],link:"https://www.youtube.com/results?search_query=present+simple+third+person"},plural_subjects:{title:"Plural Subjects",description:"Base form with plurals",tips:["The dogs run, The trains leave"],link:"https://www.youtube.com/results?search_query=subject+verb+agreement"},verb_to_be:{title:"Verb 'To Be'",description:"is/are",tips:["It is, They are"],link:"https://www.youtube.com/results?search_query=verb+to+be"}};
+let questions=[],currentQuestion=0,score=0,xpEarned=0,answered=false,timerInterval,timeLeft=600,startTime,studentName='',studentClass='',studentLevel='',categoryResults={};
+function shuffle(a){const arr=[...a];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function getProgress(){const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):{quizzes:{},totalXP:0,streak:0,badges:[],name:''};}
+function saveProgress(p){localStorage.setItem(STORAGE_KEY,JSON.stringify(p));}
+function checkUnlocked(){return true;}
+function startQuiz(){
+    
+    studentName=document.getElementById('studentName').value.trim();studentLevel=document.getElementById('studentLevel').value;studentClass=document.getElementById('studentClass').value;
+    if(!studentName){alert('Please enter your name');return;}if(!studentLevel){alert('Please select your level');return;}if(!studentClass){alert('Please select your class');return;}
+    const progress=getProgress();progress.name=studentName;saveProgress(progress);
+    questions=shuffle([...allQuestions]);questions=questions.map(q=>{const opts=q.opts.map((o,i)=>({text:o,wasCorrect:i===q.correct}));const sh=shuffle(opts);return{...q,opts:sh.map(o=>o.text),correct:sh.findIndex(o=>o.wasCorrect)};});
+    questions.forEach(q=>{if(!categoryResults[q.category])categoryResults[q.category]={correct:0,total:0};categoryResults[q.category].total++;});
+    document.getElementById('startScreen').style.display='none';document.getElementById('quizScreen').style.display='block';document.getElementById('totalQ').textContent=questions.length;startTime=Date.now();startTimer();renderQuestion();
+}
+function startTimer(){timerInterval=setInterval(()=>{timeLeft--;document.getElementById('timer').textContent=Math.floor(timeLeft/60)+':'+String(timeLeft%60).padStart(2,'0');if(timeLeft<=60)document.getElementById('timerBar').classList.add('warning');if(timeLeft<=0){clearInterval(timerInterval);finishQuiz();}},1000);}
+function renderQuestion(){const q=questions[currentQuestion];document.getElementById('currentQ').textContent=currentQuestion+1;document.getElementById('progressBar').style.width=((currentQuestion+1)/questions.length*100)+'%';let html=`<div class="question"><div class="question-header"><div class="question-num">${currentQuestion+1}</div><div class="question-text">${q.q}</div></div><div class="options">`;q.opts.forEach((o,i)=>{html+=`<div class="option" data-idx="${i}" onclick="selectOption(this)"><div class="option-letter">${String.fromCharCode(65+i)}</div><div class="option-text">${o}</div></div>`;});html+=`</div><div class="feedback" id="feedback"></div></div>`;document.getElementById('questionContainer').innerHTML=html;document.getElementById('checkBtn').disabled=true;document.getElementById('checkBtn').style.display='block';document.getElementById('nextBtn').style.display='none';answered=false;}
+function selectOption(el){if(answered)return;document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');document.getElementById('checkBtn').disabled=false;}
+function checkAnswer(){if(answered)return;answered=true;const sel=document.querySelector('.option.selected');if(!sel)return;const idx=parseInt(sel.dataset.idx),q=questions[currentQuestion],correct=idx===q.correct;if(correct)categoryResults[q.category].correct++;document.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));if(correct){sel.classList.add('correct');score++;xpEarned+=10;document.getElementById('currentXP').textContent=xpEarned;}else{sel.classList.add('incorrect');document.querySelectorAll('.option')[q.correct].classList.add('correct');}const fb=document.getElementById('feedback');fb.className='feedback '+(correct?'correct':'incorrect')+' show';fb.innerHTML=(correct?'✅ ':'❌ ')+q.explanation;document.getElementById('checkBtn').style.display='none';document.getElementById('nextBtn').style.display='block';document.getElementById('nextBtn').textContent=currentQuestion<questions.length-1?'Next →':'See Results →';}
+function nextQuestion(){currentQuestion++;if(currentQuestion<questions.length)renderQuestion();else finishQuiz();}
+function finishQuiz(){clearInterval(timerInterval);const timeTaken=Math.round((Date.now()-startTime)/1000),percent=Math.round((score/questions.length)*100);if(percent===100)xpEarned+=20;else if(percent>=80)xpEarned+=10;if(timeTaken<180)xpEarned+=10;const progress=getProgress();progress.quizzes=progress.quizzes||{};progress.quizzes[QUIZ_ID]={score,total:questions.length,time:timeTaken,date:new Date().toISOString()};progress.totalXP=(progress.totalXP||0)+xpEarned;const newBadges=[];progress.badges=progress.badges||[];if(!progress.badges.includes('dedicated')){progress.badges.push('dedicated');newBadges.push({name:'Dedicated Learner',icon:'📚'});}const allQ=Object.values(progress.quizzes);if(allQ.length>=4&&allQ.every(q=>(q.score/q.total)>=0.8)&&!progress.badges.includes('champion')){progress.badges.push('champion');newBadges.push({name:'Quiz Champion',icon:'🏆'});}if(percent===100&&!progress.badges.includes('sharpshooter')){progress.badges.push('sharpshooter');newBadges.push({name:'Sharpshooter',icon:'🎯'});}if(timeTaken<180&&!progress.badges.includes('speed_demon')){progress.badges.push('speed_demon');newBadges.push({name:'Speed Demon',icon:'⚡'});}const today=new Date().toDateString();if(progress.lastQuizDate!==today){progress.streak=(progress.streak||0)+1;progress.lastQuizDate=today;}if(progress.streak>=3&&!progress.badges.includes('on_fire')){progress.badges.push('on_fire');newBadges.push({name:'On Fire',icon:'🔥'});}saveProgress(progress);const{weakAreas,practiceHTML,status,practicePath}=generatePractice(percent);submitToForm(score,questions.length,percent,timeTaken,xpEarned,progress.totalXP,weakAreas,status,practicePath);document.getElementById('quizScreen').style.display='none';document.getElementById('resultsScreen').style.display='block';document.getElementById('finalScore').textContent=score+'/'+questions.length;document.getElementById('finalPercent').textContent=percent+'%';document.getElementById('earnedXP').textContent=xpEarned;document.getElementById('correctCount').textContent=score+'/'+questions.length;document.getElementById('timeTaken').textContent=Math.floor(timeTaken/60)+':'+String(timeTaken%60).padStart(2,'0');document.getElementById('xpEarned').textContent=xpEarned+' XP';document.getElementById('totalXPDisplay').textContent=progress.totalXP+' XP';let msg;if(percent===100)msg="🎉 PERFECT!";else if(percent>=90)msg="🌟 Excellent!";else if(percent>=80)msg="👏 Great!";else if(percent>=70)msg="👍 Good!";else if(percent>=60)msg="🌱 Review first.";else msg="🤗 Practice more.";document.getElementById('resultsMessage').textContent=msg;if(percent<70)document.getElementById('readyBanner').style.background='linear-gradient(135deg,#f5af19,#f12711)';const ps=document.getElementById('practiceSection');if(percent>=80)ps.classList.add('success');document.getElementById('practiceContent').innerHTML=practiceHTML;if(newBadges.length>0){let h='';newBadges.forEach(b=>{h+=`<div class="new-badge"><div class="badge-icon">${b.icon}</div><h4>Badge!</h4><p>${b.name}</p></div>`;});document.getElementById('newBadgeSection').innerHTML=h;}if(progress.streak>1)document.getElementById('streakSection').innerHTML=`<div class="streak-box"><div class="streak-num">🔥 ${progress.streak} Streak!</div></div>`;}
+function generatePractice(percent){const weak=[],strong=[];for(const[c,r]of Object.entries(categoryResults)){if(r.total>0&&(r.correct/r.total)<0.7)weak.push(c);else if(r.total>0)strong.push(c);}let html='';if(percent<60){html='<p style="color:#c62828;margin-bottom:15px">Review before Final:</p>';weak.forEach(a=>{if(practiceResources[a]){const r=practiceResources[a];html+=`<div class="practice-item"><h4>⚠️ ${r.title}</h4><p>${r.description}</p><ul>${r.tips.map(t=>`<li>${t}</li>`).join('')}</ul><a href="${r.link}" target="_blank">📺 Videos</a></div>`;}});}else if(percent<80){html='<p style="margin-bottom:15px">Quick review:</p>';weak.forEach(a=>{if(practiceResources[a]){const r=practiceResources[a];html+=`<div class="practice-item"><h4>📖 ${r.title}</h4><a href="${r.link}" target="_blank">📺 Practice</a></div>`;}});strong.forEach(a=>{if(practiceResources[a])html+=`<span class="strong-tag">✓ ${practiceResources[a].title}</span>`;});}else{html='<p style="color:#2e7d32">You mastered:</p>';Object.keys(practiceResources).forEach(a=>html+=`<span class="strong-tag">✓ ${practiceResources[a].title}</span>`);}const status=percent>=70?'READY FOR FINAL TEST':'Review Recommended';const path=weak.length>0?weak.map(a=>practiceResources[a]?practiceResources[a].title:a).join(', '):'None';return{weakAreas:path,practiceHTML:html,status,practicePath:path};}
+function submitToForm(score,total,percent,time,xp,totalXP,weak,status,path){const nameWithClass=studentName+' · '+studentClass;const timeStr=Math.floor(time/60)+':'+String(time%60).padStart(2,'0');const url='https://docs.google.com/forms/d/e/1FAIpQLSd--80V_b4ovCyNW76LAYTbGy30gvafPtU39a3ijUWLO5mGng/viewform?usp=pp_url'+'&entry.259682097='+encodeURIComponent(nameWithClass)+'&entry.2006644851='+encodeURIComponent(studentLevel)+'&entry.1804734502='+encodeURIComponent(QUIZ_NAME)+'&entry.543583340='+encodeURIComponent(score+'/'+total)+'&entry.875764515='+encodeURIComponent(percent+'%')+'&entry.62512107='+encodeURIComponent(timeStr)+'&entry.886790949='+encodeURIComponent(String(xp))+'&entry.733779557='+encodeURIComponent(String(totalXP))+'&entry.134668824='+encodeURIComponent(weak)+'&entry.1786008516='+encodeURIComponent(status)+'&entry.998097996='+encodeURIComponent(path);document.getElementById('formSubmitBtn').href=url;}function goToDashboard(){window.location.href='index.html';}
+
+</script>
+</body>
+</html>

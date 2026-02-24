@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1 Quiz 1: To Be & Pronouns</title>
+    <style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
+.container{max-width:700px;margin:0 auto}
+.header{background:#fff;border-radius:20px;padding:25px;margin-bottom:20px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.header h1{color:#764ba2;font-size:1.4em;margin-bottom:5px}
+.quiz-badge{background:#667eea;color:#fff;padding:4px 12px;border-radius:20px;font-size:.8em;display:inline-block;margin-bottom:10px}
+.level-tag{background:#f0e6ff;color:#764ba2;padding:3px 10px;border-radius:10px;font-size:.75em;margin-left:8px}
+.timer-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:15px;padding:10px;background:#fff3cd;border-radius:10px}
+.timer-bar .icon{font-size:1.3em}
+.timer-bar .time{font-size:1.2em;font-weight:700;color:#856404}
+.timer-bar.warning{background:#ffebee}
+.timer-bar.warning .time{color:#c62828}
+.card{background:#fff;border-radius:16px;padding:25px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.progress-text{font-size:.9em;color:#666}
+.xp-display{background:#f0e6ff;padding:6px 12px;border-radius:20px;font-weight:600;color:#764ba2;font-size:.9em}
+.progress-bar-bg{height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden;margin-bottom:20px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:4px;transition:width 0.3s}
+.question{margin-bottom:25px}
+.question-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:15px}
+.question-num{background:#764ba2;color:#fff;min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9em}
+.question-text{font-size:1.1em;color:#333;font-weight:500;line-height:1.4}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{padding:15px;border:2px solid #e0e0e0;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .2s}
+.option:hover{border-color:#764ba2;background:#f0e6ff}
+.option.selected{border-color:#764ba2;background:#e0d4f7}
+.option.correct{border-color:#22c55e;background:#f0fdf4}
+.option.incorrect{border-color:#ef4444;background:#fef2f2}
+.option.disabled{pointer-events:none}
+.option-letter{width:28px;height:28px;border:2px solid #ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.85em;flex-shrink:0}
+.option.selected .option-letter{border-color:#764ba2;background:#764ba2;color:#fff}
+.option.correct .option-letter{border-color:#22c55e;background:#22c55e;color:#fff}
+.option.incorrect .option-letter{border-color:#ef4444;background:#ef4444;color:#fff}
+.option-text{flex:1}
+.feedback{margin-top:10px;padding:12px 15px;border-radius:10px;font-size:.9em;display:none}
+.feedback.correct{background:#f0fdf4;border:1px solid #22c55e;color:#166534}
+.feedback.incorrect{background:#fef2f2;border:1px solid #ef4444;color:#991b1b}
+.feedback.show{display:block}
+.btn{background:#764ba2;color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;width:100%;margin-top:15px;transition:all .2s}
+.btn:hover{background:#5a3d7a}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.btn-next{background:#22c55e}
+.btn-next:hover{background:#16a34a}
+.results-screen{display:none}
+.results-card{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:20px;padding:35px;color:#fff;text-align:center}
+.results-score{font-size:4em;font-weight:700}
+.results-label{font-size:1.2em;opacity:.9;margin-top:5px}
+.results-message{font-size:1.2em;margin-top:20px;padding:15px;background:rgba(255,255,255,.15);border-radius:12px}
+.results-xp{margin-top:20px;font-size:1.1em}
+.results-xp span{font-size:1.5em;font-weight:700}
+.results-details{background:#fff;border-radius:16px;padding:20px;margin-top:20px;color:#333}
+.results-details h3{color:#764ba2;margin-bottom:15px}
+.result-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
+.result-row:last-child{border-bottom:none}
+.practice-section{background:#fff;border-radius:16px;padding:20px;margin-top:20px;border-left:4px solid #ef4444}
+.practice-section.success{border-left-color:#22c55e}
+.practice-section h3{color:#333;margin-bottom:15px;display:flex;align-items:center;gap:10px}
+.practice-item{background:#fef2f2;border-radius:10px;padding:15px;margin-bottom:10px}
+.practice-item.success{background:#f0fdf4}
+.practice-item h4{color:#333;margin-bottom:8px;font-size:.95em}
+.practice-item p{color:#666;font-size:.85em;margin-bottom:10px}
+.practice-item ul{margin:10px 0;padding-left:20px;color:#666;font-size:.85em}
+.practice-item a{display:inline-block;background:#764ba2;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:.85em;font-weight:600}
+.weak-tag{display:inline-block;background:#ffebee;color:#c62828;padding:4px 10px;border-radius:15px;font-size:.8em;margin:3px;font-weight:500}
+.strong-tag{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:4px 10px;border-radius:15px;font-size:.8em;margin:3px;font-weight:500}
+.new-badge{background:#fff3cd;border:2px solid #ffc107;border-radius:12px;padding:15px;margin-top:15px;text-align:center}
+.new-badge h4{color:#856404;margin-bottom:5px}
+.new-badge .badge-icon{font-size:2em}
+.btn-dashboard{background:#F5A623;margin-top:15px}
+.btn-dashboard:hover{background:#e09000}
+.streak-box{background:linear-gradient(135deg,#f093fb,#f5576c);border-radius:12px;padding:15px;margin-top:15px;color:#fff;text-align:center}
+.streak-num{font-size:1.5em;font-weight:700}
+.name-section{margin-bottom:20px}
+.name-section input{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px}
+.name-section input:focus{outline:none;border-color:#764ba2}
+.class-section{margin:15px 0}
+.class-section select{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;background:#fff;cursor:pointer}
+.class-section select:focus{outline:none;border-color:#764ba2}
+.start-card{text-align:center}
+.start-card h2{color:#764ba2;margin-bottom:10px}
+.start-card p{color:#666;margin-bottom:20px}
+.start-info{background:#f0e6ff;border-radius:12px;padding:15px;margin-bottom:20px;text-align:left}
+.start-info li{margin:8px 0;color:#555}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Start Screen -->
+    <div id="startScreen">
+        <div class="header">
+            <div class="quiz-badge">Quiz 1 of 4</div>
+            <span class="level-tag">A1 Beginner</span>
+            <h1>📚 To Be & Subject Pronouns</h1>
+            <p style="color:#666;font-size:.9em">Class 3 Quiz • Term 1/2026</p>
+        </div>
+        <div class="card start-card">
+            <h2>Welcome! 👋</h2>
+            <p>Test what you learned in Classes 1-3</p>
+            <div class="start-info">
+                <ul>
+                    <li>⏱️ 15 questions • 10 minutes</li>
+                    <li>⭐ Earn XP for correct answers</li>
+                    <li>🏆 Unlock badges for great performance</li>
+                    <li>📊 Get personalized practice tips</li>
+                </ul>
+            </div>
+            <div class="name-section">
+                <input type="text" id="studentName" placeholder="Enter your full name...">
+            </div>
+            <div class="class-section">
+                <select id="studentLevel">
+                    <option value="">Select your level...</option>
+                    <option value="A1 (PS1) - Beginner" selected>A1 (PS1) - Beginner</option>
+                    <option value="A2 (PS2) - Elementary">A2 (PS2) - Elementary</option>
+                    <option value="B1 (PS3) - Intermediate">B1 (PS3) - Intermediate</option>
+                    <option value="B2 (JS1) - Upper-Intermediate">B2 (JS1) - Upper-Intermediate</option>
+                    <option value="C1 (JS2) - Advanced">C1 (JS2) - Advanced</option>
+                    <option value="Conversation">Conversation</option>
+                </select>
+            </div>
+            <div class="class-section">
+                <select id="studentClass">
+                    <option value="">Select your class...</option>
+                    <optgroup label="A1 (PS1) - Beginner">
+                        <option value="3071-MW-11AM">3071 - Mon/Wed 11:00 AM (Eunice)</option>
+                        <option value="3081-TTH-11AM">3081 - Tue/Thu 11:00 AM (Eunice)</option>
+                    </optgroup>
+                    <optgroup label="A2 (PS2) - Elementary">
+                        <option value="3072-MW-9AM">3072 - Mon/Wed 9:00 AM (Angela)</option>
+                        <option value="3082-TTH-9AM">3082 - Tue/Thu 9:00 AM (Angela)</option>
+                    </optgroup>
+                    <optgroup label="B1 (PS3) - Intermediate">
+                        <option value="3073-MW-9AM">3073 - Mon/Wed 9:00 AM (Tom)</option>
+                        <option value="3083-TTH-9AM">3083 - Tue/Thu 9:00 AM (Tom)</option>
+                    </optgroup>
+                    <optgroup label="B2 (JS1) - Upper-Intermediate">
+                        <option value="3074-MW-11AM">3074 - Mon/Wed 11:00 AM (Laura)</option>
+                        <option value="3084-TTH-11AM">3084 - Tue/Thu 11:00 AM (Laura)</option>
+                    </optgroup>
+                    <optgroup label="C1 (JS2) - Advanced">
+                        <option value="3075-MW-11AM">3075 - Mon/Wed 11:00 AM (Laura)</option>
+                        <option value="3085-TTH-11AM">3085 - Tue/Thu 11:00 AM (Laura)</option>
+                    </optgroup>
+                    <optgroup label="Conversation">
+                        <option value="3076-SAT-9AM">3076 - Saturday 9:00 AM (Laura)</option>
+                    </optgroup>
+                </select>
+            </div>
+            <button class="btn" onclick="startQuiz()">Start Quiz →</button>
+        </div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quizScreen" style="display:none">
+        <div class="header">
+            <div class="quiz-badge">Quiz 1 of 4</div>
+            <h1>📚 To Be & Subject Pronouns</h1>
+            <div class="timer-bar" id="timerBar">
+                <span class="icon">⏱️</span>
+                <span class="time" id="timer">10:00</span>
+            </div>
+        </div>
+        <div class="card">
+            <div class="progress-row">
+                <span class="progress-text">Question <span id="currentQ">1</span> of <span id="totalQ">15</span></span>
+                <span class="xp-display">⭐ <span id="currentXP">0</span> XP</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar" style="width:6.67%"></div>
+            </div>
+            <div id="questionContainer"></div>
+            <button class="btn" id="checkBtn" onclick="checkAnswer()" disabled>Check Answer</button>
+            <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()" style="display:none">Next Question →</button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div class="results-screen" id="resultsScreen">
+        <div class="results-card">
+            <p style="opacity:.8">Quiz Complete!</p>
+            <div class="results-score" id="finalScore">0/15</div>
+            <div class="results-label" id="finalPercent">0%</div>
+            <div class="results-message" id="resultsMessage">Great job!</div>
+            <div class="results-xp">You earned <span id="earnedXP">0</span> XP! ⭐</div>
+        </div>
+        <div class="results-details">
+            <h3>📊 Your Results</h3>
+            <div class="result-row"><span>Correct Answers</span><span id="correctCount">0/15</span></div>
+            <div class="result-row"><span>Time Taken</span><span id="timeTaken">0:00</span></div>
+            <div class="result-row"><span>XP Earned</span><span id="xpEarned">0</span></div>
+        </div>
+        <div class="practice-section" id="practiceSection">
+            <h3 id="practiceTitle">📚 Areas to Practice</h3>
+            <div id="practiceContent"></div>
+        </div>
+        <div id="newBadgeSection"></div>
+        <div id="streakSection"></div>
+        <div style="background:#fff3cd;border:2px solid #f5a623;border-radius:14px;padding:16px;margin-bottom:12px;text-align:center;">
+    <p style="font-size:.9em;color:#856404;margin-bottom:10px;">⚠️ <strong>Two steps to submit:</strong><br>1️⃣ Click the button below &nbsp;→&nbsp; 2️⃣ Click <strong>Submit</strong> on the form</p>
+    <a id="formSubmitBtn" href="#" target="_blank" style="background:linear-gradient(135deg,#f5a623,#e8470a);color:#fff;padding:20px;border-radius:14px;font-size:1.15em;font-weight:800;text-align:center;text-decoration:none;display:block;width:100%;box-sizing:border-box;letter-spacing:.5px;box-shadow:0 6px 20px rgba(245,166,35,.4);">📨 SUBMIT RESULTS TO TEACHER →</a>
+</div>
+        <button class="btn btn-dashboard" onclick="goToDashboard()">← Back to Dashboard</button>
+        <button class="btn" onclick="retryQuiz()" style="background:#666;margin-top:10px">Try Again</button>
+    </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'SQA_A1_Quiz_Progress';
+const QUIZ_ID = 1;
+const QUIZ_NAME = 'A1 Quiz 1: To Be & Pronouns (Class 3)';
+const LEVEL = 'A1';
+
+// Questions from the original Class 3 quiz
+const allQuestions = [
+    // Verb "to be" questions
+    { q: "I ______ a teacher.", opts: ["is", "are", "am", "be"], correct: 2, category: "verb_to_be", explanation: "Use 'am' with 'I': I am a teacher." },
+    { q: "We ______ from Brazil.", opts: ["is", "am", "are", "be"], correct: 2, category: "verb_to_be", explanation: "Use 'are' with 'we': We are from Brazil." },
+    { q: "You ______ happy today.", opts: ["is", "am", "are", "be"], correct: 2, category: "verb_to_be", explanation: "Use 'are' with 'you': You are happy." },
+    { q: "She ______ tall.", opts: ["is", "are", "am", "be"], correct: 0, category: "verb_to_be", explanation: "Use 'is' with 'she': She is tall." },
+    { q: "The books ______ old.", opts: ["is", "are", "am", "be"], correct: 1, category: "verb_to_be", explanation: "Use 'are' with plural nouns: The books are old." },
+    { q: "It ______ cold outside.", opts: ["is", "are", "am", "be"], correct: 0, category: "verb_to_be", explanation: "Use 'is' with 'it': It is cold." },
+    { q: "We ______ students.", opts: ["is", "are", "am", "be"], correct: 1, category: "verb_to_be", explanation: "Use 'are' with 'we': We are students." },
+    { q: "He ______ a doctor.", opts: ["is", "are", "am", "be"], correct: 0, category: "verb_to_be", explanation: "Use 'is' with 'he': He is a doctor." },
+    { q: "Frank ______ my best friend.", opts: ["is", "are", "am", "be"], correct: 0, category: "verb_to_be", explanation: "Use 'is' with names (he/she): Frank is my best friend." },
+    
+    // Subject pronoun questions
+    { q: "______ are my friends.", opts: ["He", "She", "I", "They"], correct: 3, category: "pronouns", explanation: "'They' is used for multiple people: They are my friends." },
+    { q: "______ is my sister.", opts: ["He", "She", "It", "They"], correct: 1, category: "pronouns", explanation: "'She' is used for female: She is my sister." },
+    { q: "This is my bike. I like ______ very much.", opts: ["he", "she", "it", "they"], correct: 2, category: "pronouns", explanation: "'It' is used for things: I like it." },
+    { q: "______ is my brother.", opts: ["He", "She", "It", "They"], correct: 0, category: "pronouns", explanation: "'He' is used for male: He is my brother." },
+    { q: "______ am not ready.", opts: ["I", "You", "He", "It"], correct: 0, category: "pronouns", explanation: "'I' goes with 'am': I am not ready." },
+    { q: "______ are on the table.", opts: ["They", "Them", "It", "She"], correct: 0, category: "pronouns", explanation: "'They' is the subject pronoun for plural: They are on the table." }
+];
+
+// Practice resources
+const practiceResources = {
+    verb_to_be: {
+        title: "Verb 'To Be' (am/is/are)",
+        description: "Practice using am, is, are correctly.",
+        tips: [
+            "I → am (I am happy)",
+            "You/We/They → are (They are students)", 
+            "He/She/It → is (She is tall)",
+            "Plural nouns → are (The books are old)"
+        ],
+        link: "https://www.youtube.com/results?search_query=verb+to+be+am+is+are+beginners"
+    },
+    pronouns: {
+        title: "Subject Pronouns",
+        description: "Practice choosing the correct pronoun.",
+        tips: [
+            "I - for yourself",
+            "You - for the person you talk to",
+            "He - for a man/boy",
+            "She - for a woman/girl",
+            "It - for things/animals",
+            "We - for yourself + others",
+            "They - for other people/things"
+        ],
+        link: "https://www.youtube.com/results?search_query=subject+pronouns+english+beginners"
+    }
+};
+
+let questions = [];
+let currentQuestion = 0;
+let score = 0;
+let xpEarned = 0;
+let answered = false;
+let timerInterval;
+let timeLeft = 600;
+let startTime;
+let studentName = '';
+let studentClass = '';
+let studentLevel = '';
+let categoryResults = {};
+
+function shuffle(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startQuiz() {
+    studentName = document.getElementById('studentName').value.trim();
+    studentLevel = document.getElementById('studentLevel').value;
+    studentClass = document.getElementById('studentClass').value;
+    if (!studentName) { alert('Please enter your name'); return; }
+    if (!studentLevel) { alert('Please select your level'); return; }
+    if (!studentClass) { alert('Please select your class'); return; }
+    
+    // Save name to progress
+    const progress = getProgress();
+    progress.name = studentName;
+    saveProgress(progress);
+    
+    // Prepare questions
+    questions = shuffle([...allQuestions]);
+    questions = questions.map(q => {
+        const opts = q.opts.map((opt, idx) => ({ text: opt, wasCorrect: idx === q.correct }));
+        const shuffled = shuffle(opts);
+        return { ...q, opts: shuffled.map(o => o.text), correct: shuffled.findIndex(o => o.wasCorrect) };
+    });
+    
+    // Initialize category tracking
+    questions.forEach(q => {
+        if (!categoryResults[q.category]) categoryResults[q.category] = { correct: 0, total: 0 };
+        categoryResults[q.category].total++;
+    });
+    
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('quizScreen').style.display = 'block';
+    document.getElementById('totalQ').textContent = questions.length;
+    
+    startTime = Date.now();
+    startTimer();
+    renderQuestion();
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = Math.floor(timeLeft/60) + ':' + String(timeLeft%60).padStart(2,'0');
+        if (timeLeft <= 60) document.getElementById('timerBar').classList.add('warning');
+        if (timeLeft <= 0) { clearInterval(timerInterval); finishQuiz(); }
+    }, 1000);
+}
+
+function renderQuestion() {
+    const q = questions[currentQuestion];
+    document.getElementById('currentQ').textContent = currentQuestion + 1;
+    document.getElementById('progressBar').style.width = ((currentQuestion + 1) / questions.length * 100) + '%';
+    
+    let html = `<div class="question"><div class="question-header"><div class="question-num">${currentQuestion + 1}</div><div class="question-text">${q.q}</div></div><div class="options">`;
+    q.opts.forEach((opt, idx) => {
+        html += `<div class="option" data-idx="${idx}" onclick="selectOption(this)"><div class="option-letter">${String.fromCharCode(65 + idx)}</div><div class="option-text">${opt}</div></div>`;
+    });
+    html += `</div><div class="feedback" id="feedback"></div></div>`;
+    
+    document.getElementById('questionContainer').innerHTML = html;
+    document.getElementById('checkBtn').disabled = true;
+    document.getElementById('checkBtn').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'none';
+    answered = false;
+}
+
+function selectOption(el) {
+    if (answered) return;
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('checkBtn').disabled = false;
+}
+
+function checkAnswer() {
+    if (answered) return;
+    answered = true;
+    
+    const selected = document.querySelector('.option.selected');
+    if (!selected) return;
+    
+    const selectedIdx = parseInt(selected.dataset.idx);
+    const q = questions[currentQuestion];
+    const isCorrect = selectedIdx === q.correct;
+    
+    if (isCorrect) categoryResults[q.category].correct++;
+    
+    document.querySelectorAll('.option').forEach(o => o.classList.add('disabled'));
+    
+    if (isCorrect) {
+        selected.classList.add('correct');
+        score++;
+        xpEarned += 10;
+        document.getElementById('currentXP').textContent = xpEarned;
+    } else {
+        selected.classList.add('incorrect');
+        document.querySelectorAll('.option')[q.correct].classList.add('correct');
+    }
+    
+    const feedback = document.getElementById('feedback');
+    feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect') + ' show';
+    feedback.innerHTML = (isCorrect ? '✅ <strong>Correct!</strong> ' : '❌ <strong>Not quite.</strong> ') + q.explanation;
+    
+    document.getElementById('checkBtn').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'block';
+    document.getElementById('nextBtn').textContent = currentQuestion < questions.length - 1 ? 'Next Question →' : 'See Results →';
+}
+
+function nextQuestion() {
+    currentQuestion++;
+    if (currentQuestion < questions.length) renderQuestion();
+    else finishQuiz();
+}
+
+function finishQuiz() {
+    clearInterval(timerInterval);
+    const timeTaken = Math.round((Date.now() - startTime) / 1000);
+    const percent = Math.round((score / questions.length) * 100);
+    
+    if (percent === 100) xpEarned += 20;
+    else if (percent >= 80) xpEarned += 10;
+    if (timeTaken < 180) xpEarned += 10;
+    
+    const progress = getProgress();
+    progress.quizzes = progress.quizzes || {};
+    progress.quizzes[QUIZ_ID] = { score, total: questions.length, time: timeTaken, date: new Date().toISOString(), categories: categoryResults };
+    progress.totalXP = (progress.totalXP || 0) + xpEarned;
+    
+    const newBadges = [];
+    progress.badges = progress.badges || [];
+    
+    if (!progress.badges.includes('first_steps')) {
+        progress.badges.push('first_steps');
+        newBadges.push({ name: 'First Steps', icon: '🌟' });
+    }
+    if (percent === 100 && !progress.badges.includes('sharpshooter')) {
+        progress.badges.push('sharpshooter');
+        newBadges.push({ name: 'Sharpshooter', icon: '🎯' });
+    }
+    if (timeTaken < 180 && !progress.badges.includes('speed_demon')) {
+        progress.badges.push('speed_demon');
+        newBadges.push({ name: 'Speed Demon', icon: '⚡' });
+    }
+    
+    const today = new Date().toDateString();
+    if (progress.lastQuizDate !== today) {
+        progress.streak = (progress.streak || 0) + 1;
+        progress.lastQuizDate = today;
+    }
+    if (progress.streak >= 3 && !progress.badges.includes('on_fire')) {
+        progress.badges.push('on_fire');
+        newBadges.push({ name: 'On Fire', icon: '🔥' });
+    }
+    
+    saveProgress(progress);
+    
+    // Generate practice recommendations
+    const { weakAreas, practiceHTML, status, practicePath } = generatePractice(percent);
+    
+    // Submit to Google Form
+    submitToForm(score, questions.length, percent, timeTaken, xpEarned, progress.totalXP, weakAreas, status, practicePath);
+    
+    // Display results
+    document.getElementById('quizScreen').style.display = 'none';
+    document.getElementById('resultsScreen').style.display = 'block';
+    
+    document.getElementById('finalScore').textContent = score + '/' + questions.length;
+    document.getElementById('finalPercent').textContent = percent + '%';
+    document.getElementById('earnedXP').textContent = xpEarned;
+    document.getElementById('correctCount').textContent = score + '/' + questions.length;
+    document.getElementById('timeTaken').textContent = Math.floor(timeTaken/60) + ':' + String(timeTaken%60).padStart(2,'0');
+    document.getElementById('xpEarned').textContent = xpEarned + ' XP';
+    
+    let message;
+    if (percent === 100) message = "🎉 PERFECT! You're amazing!";
+    else if (percent >= 90) message = "🌟 Excellent work!";
+    else if (percent >= 80) message = "👏 Great job!";
+    else if (percent >= 70) message = "👍 Good effort!";
+    else if (percent >= 60) message = "🌱 Keep practicing!";
+    else message = "🤗 Don't give up! Practice below.";
+    document.getElementById('resultsMessage').textContent = message;
+    
+    const practiceSection = document.getElementById('practiceSection');
+    if (percent >= 80) {
+        practiceSection.classList.add('success');
+        document.getElementById('practiceTitle').innerHTML = '✅ Great Job!';
+    }
+    document.getElementById('practiceContent').innerHTML = practiceHTML;
+    
+    if (newBadges.length > 0) {
+        let html = '';
+        newBadges.forEach(b => { html += `<div class="new-badge"><div class="badge-icon">${b.icon}</div><h4>Badge Unlocked!</h4><p>${b.name}</p></div>`; });
+        document.getElementById('newBadgeSection').innerHTML = html;
+    }
+    
+    if (progress.streak > 1) {
+        document.getElementById('streakSection').innerHTML = `<div class="streak-box"><div class="streak-num">🔥 ${progress.streak} Quiz Streak!</div></div>`;
+    }
+}
+
+function generatePractice(percent) {
+    const weakAreas = [], strongAreas = [];
+    
+    for (const [cat, res] of Object.entries(categoryResults)) {
+        const catPct = res.total > 0 ? (res.correct / res.total) * 100 : 0;
+        if (catPct < 70) weakAreas.push(cat);
+        else strongAreas.push(cat);
+    }
+    
+    let practiceHTML = '';
+    
+    if (percent < 60) {
+        // Needs significant practice
+        practiceHTML = '<p style="color:#c62828;margin-bottom:15px;font-weight:600">Score below 60% - Please review these topics:</p>';
+        weakAreas.forEach(area => {
+            const r = practiceResources[area];
+            practiceHTML += `<div class="practice-item"><h4>⚠️ ${r.title}</h4><p>${r.description}</p><ul>${r.tips.map(t => `<li>${t}</li>`).join('')}</ul><a href="${r.link}" target="_blank">📺 Watch Videos</a></div>`;
+        });
+        if (strongAreas.length > 0) {
+            practiceHTML += '<p style="margin-top:15px;color:#2e7d32">Good at: ';
+            strongAreas.forEach(a => { practiceHTML += `<span class="strong-tag">${practiceResources[a].title}</span>`; });
+            practiceHTML += '</p>';
+        }
+    } else if (percent < 80) {
+        // Could use some review
+        practiceHTML = '<p style="margin-bottom:15px">Consider reviewing:</p>';
+        if (weakAreas.length > 0) {
+            weakAreas.forEach(area => {
+                const r = practiceResources[area];
+                practiceHTML += `<div class="practice-item"><h4>📖 ${r.title}</h4><p>${r.description}</p><a href="${r.link}" target="_blank">📺 Practice More</a></div>`;
+            });
+        }
+        strongAreas.forEach(a => { practiceHTML += `<span class="strong-tag">✓ ${practiceResources[a].title}</span>`; });
+    } else {
+        // Great job!
+        practiceHTML = '<p style="color:#2e7d32;margin-bottom:10px">You did great on:</p>';
+        Object.keys(practiceResources).forEach(a => { practiceHTML += `<span class="strong-tag">✓ ${practiceResources[a].title}</span>`; });
+    }
+    
+    const status = percent >= 80 ? 'Ready for Quiz 2' : percent >= 60 ? 'Review Recommended' : 'Practice Required';
+    const practicePath = weakAreas.length > 0 ? weakAreas.map(a => practiceResources[a].title).join(', ') : 'None needed';
+    
+    return { weakAreas: practicePath, practiceHTML, status, practicePath };
+}
+
+function getProgress() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : { quizzes: {}, totalXP: 0, streak: 0, badges: [], name: '' };
+}
+
+function saveProgress(progress) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+}
+
+function submitToForm(score, total, percent, timeTaken, xp, totalXP, weakAreas, status, practicePath) {
+    const nameWithClass = studentName + ' · ' + studentClass;
+    const timeStr = Math.floor(timeTaken/60) + ':' + String(timeTaken%60).padStart(2,'0');
+    const url = 'https://docs.google.com/forms/d/e/1FAIpQLSd--80V_b4ovCyNW76LAYTbGy30gvafPtU39a3ijUWLO5mGng/viewform?usp=pp_url'
+        + '&entry.259682097=' + encodeURIComponent(nameWithClass)
+        + '&entry.2006644851=' + encodeURIComponent(studentLevel)
+        + '&entry.1804734502=' + encodeURIComponent(QUIZ_NAME)
+        + '&entry.543583340='  + encodeURIComponent(score + '/' + total)
+        + '&entry.875764515='  + encodeURIComponent(percent + '%')
+        + '&entry.62512107='   + encodeURIComponent(timeStr)
+        + '&entry.886790949='  + encodeURIComponent(String(xp))
+        + '&entry.733779557='  + encodeURIComponent(String(totalXP))
+        + '&entry.134668824='  + encodeURIComponent(weakAreas)
+        + '&entry.1786008516=' + encodeURIComponent(status)
+        + '&entry.998097996='  + encodeURIComponent(practicePath);
+    document.getElementById('formSubmitBtn').href = url;
+}
+
+function goToDashboard() { window.location.href = 'index.html'; }
+function retryQuiz() { location.reload(); }
+</script>
+</body>
+</html>
